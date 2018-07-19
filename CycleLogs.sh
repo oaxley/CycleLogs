@@ -4,6 +4,9 @@
 #
 # @brief	Recycle logs directory weekly/monthly or yearly
 # @history
+#           2018-07-18 - 1.1.0 - SLE
+#           Add 'last' business day link
+#
 #			2018-07-12 - 1.0.0 - SLE
 #			Initial Version
 
@@ -36,6 +39,7 @@ Syntax:
     ${SCRIPT_NAME} [OPTIONS]
 
 Specials symlinks 'today' & 'yesterday' will be created to reflect the current directory in use.
+The previous business day will be represented by the symlink 'last'.
 
 -- OPTIONS --
 
@@ -163,28 +167,40 @@ function _updateLinks
 
     pushd "${DIRECTORY}" >/dev/null 2>&1
 
+    # previous business day
+    PREVIOUS_DAY=$(date "+%w")
+    if [ $PREVIOUS_DAY == 1 ]; then
+        LOOK_BACK=3
+    else
+        LOOK_BACK=1
+    fi
+
     # compute the value for today/yesterday
     case "${PERIOD}" in
         "weekly")
             TODAY=$(date "+%a")
             YESTERDAY=$(date --date "yesterday" "+%a")
+            LAST=$(date --date "${LOOK_BACK} day ago" "+%a")
             ;;
         "monthly")
             TODAY=$(date "+%d")
             YESTERDAY=$(date --date "yesterday" "+%d")
+            LAST=$(date --date "${LOOK_BACK} day ago" "+%d")
             ;;
         "yearly")
             TODAY=$(date "+%m-%b/%d")
             YESTERDAY=$(date --date "yesterday" "+%m-%b/%d")
+            LAST=$(date --date "${LOOK_BACK} day ago" "+%m-%b/%d")
             ;;
     esac
 
     # remove previous link
-    rm -f today yesterday
+    rm -f today yesterday last
 
     # recreate the links
     ln -sf ${TODAY} today
     ln -sf ${YESTERDAY} yesterday
+    ln -sf ${LAST} last
 
     # take the proper action for today
     pushd ${TODAY} >/dev/null 2>&1

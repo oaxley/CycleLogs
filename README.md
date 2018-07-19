@@ -7,7 +7,7 @@ Syntax:
     CycleLogs.sh [OPTIONS]
 ```
 
-Specials symlinks '**today**' & '**yesterday**' will be created in the directory.  
+Specials symlinks '**today**', '**yesterday**' & '**last**' will be created in the directory.  
 They should be used to efficiently manage the logs on the system:  
 ```
     myprogram.sh >$HOME/logs/today/myprogram.log
